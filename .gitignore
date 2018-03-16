@@ -1,0 +1,7 @@
+code/modeling_language
+*.pyc
+*.pdf
+*.xlsx
+*.svg
+*.png
+*ipynb_checkpoints*

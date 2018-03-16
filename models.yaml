@@ -1,0 +1,149 @@
+calibration:
+    beta: 0.842105263  #0.8/(0.8+0.15),
+    a: 0.8
+    c: 0.15
+    estar: -0.0
+    lam: 0.8
+    Rbar: 1.0
+    min_f: 0
+    kappa: 1.0
+    N: 40
+    zbar: 0.1
+    p: 1.0
+    b: 0.0
+    Delta: 0.0
+    L: 0.0
+    theta: 1000
+    T: 5
+
+
+optimal:
+  - -z[s] + etree.values[s]   ⟂  z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x] | x in S(s)] + 1.0/(a+c)*(z[s]-f[s]*(1-theta/2*f[s]))  ⟂  e[s]
+  - len(s)==1:
+    - (-Gamma[s]) + (1-theta*f[s])*(e[s]-estar)       ⟂  Gamma[s]
+  - len(s)>1:
+    - (-Gamma[s]) + a/(a+c)*p*Gamma[P(s)] + (1-theta*f[s])*(p*beta)**t*(e[s]-estar)         ⟂  Gamma[s]
+  - len(s)<len(etree):
+      - (-Gamma[s]) + E[ Gamma[x] | x in S(s) ] + psi[s] - phi[s]     ⟂  f[s]
+  - len(s)==len(etree): # two periods outflows
+    - -f[s]                                                           ⟂  f[s]
+  - Rbar - Sum[f[x] | x in H(s)] - R[s]                        ⟂  R[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                             ⟂  0 <= psi[s]
+  - (-(f[s]-min_f))                                            ⟂  0 <= phi[s]
+
+
+# peg
+peg:
+  - -z[s] + etree.values[s]                                         ⟂ z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x] | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])  ⟂ e[s]
+  - len(s)==1:
+    - -Gamma[s] + (e[s]-estar)                                   ⟂ Gamma[s]
+  - len(s)>1:
+    - -Gamma[s] + a/(a+c)*p*Gamma[P(s)] + (p*beta)**t*(e[s]-estar)     ⟂ Gamma[s]
+  - len(s)<len(etree):
+    - -e[s] + z[s]/(a*(1-p)+c)*(1-kappa) + psi[s]                      ⟂ f[s]
+  - len(s)==len(etree):
+    - f[s]                                                     ⟂ f[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                             ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                            ⟂ 0 <= phi[s]
+
+
+# volume
+volume:
+  - -z[s] + etree.values[s]                                     ⟂ z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x] | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])  ⟂ e[s]
+  - len(s)==1:
+        - -Gamma[s] + (e[s]-estar)                              ⟂ Gamma[s]
+  - len(s)>1:
+    - -Gamma[s] + a/(a+c)*p*Gamma[P(s)] + (p*beta)**t*(e[s]-estar)  ⟂ Gamma[s]
+  - len(s)<len(etree):
+    - -f[s] + kappa*z[s] - psi[s]                                 ⟂ f[s]
+  - len(s)==len(etree):
+    - f[s]                                                       ⟂ f[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                                  ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                                 ⟂  0 <= phi[s]
+
+moving_target:
+  - -z[s] + etree.values[s]                                         ⟂ z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x]   | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])  ⟂ e[s]
+  - (-target[s]) + zbar/c*(1-lam**t)                                  ⟂ target[s]
+  - len(s)==1:
+    - (-Gamma[s]) + (e[s]-target[s])                                  ⟂ Gamma[s]
+  - len(s)>1:
+    - (-Gamma[s]) + a/(a+c)*Gamma[P(s)] + (p*beta)**t*(e[s]-target[s])  ⟂ Gamma[s]
+  - sum(s)<1:
+    - (-Gamma[s]) + E[ Gamma[x] | x in S(s) ] + psi[s] - phi[s]     ⟂ f[s]
+  - sum(s)==1: # two periods outflows
+    - -f[s]                                                     ⟂ f[s]
+  # - sum(s)<=1:
+  #   - (-Gamma[s]) + E[ Gamma[x] | x in S(s) ] + psi[s] - phi[s]     | f[s]
+  # - sum(s)==2: # two periods outflows
+  #   - -f[s]                                                         | f[s]
+  - Rbar - Sum[f[x] | x in H(s)] - R[s]                             ⟂ R[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                                  ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                                 ⟂ 0 <= phi[s]
+
+
+
+stochastic:
+  - -z[s] + etree.values[s]                                ⟂ z[s]
+  - -e[s] + a/(a+c)*E[ e[x] | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])   ⟂ e[s]
+  - t==0:
+    - (-Gamma[s]) + (e[s]-estar)                           ⟂ Gamma[s]
+  - t>=1:
+    - (-Gamma[s]) + a/(a+c)*Gamma[P(s)] + (beta)**t*(e[s]-estar)         ⟂ Gamma[s]
+  - pp[s] - prob(s)  ⟂  pp[s]
+  - sum(s)<1:
+    - (-Gamma[s]/prob(s)) + E[ Gamma[x]/prob(s) | x in S(s) ] + psi[s] - phi[s]   ⟂ f[s]
+  - sum(s)==1:
+#      - -f[s]                                                           ⟂ f[s]
+    -  (Gamma[s] - psi[s])   ⟂ f[s]
+  - sum(s)==2: # two periods outflows
+    - -f[s]                                                           ⟂ f[s]
+  - Rbar - Sum[f[x] | x in H(s)] - R[s]                             ⟂ R[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                                  ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                                 ⟂ 0 <= phi[s]
+
+
+peg_T:
+  - -z[s] + etree.values[s]                                       ⟂ z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x] | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])  ⟂ e[s]
+  - len(s)==1:
+    - -Gamma[s] + (e[s]-estar)                                    ⟂ Gamma[s]
+  - len(s)>1:
+    - -Gamma[s] + a/(a+c)*p*Gamma[P(s)] + (p*beta)**t*(e[s]-estar)      ⟂ Gamma[s]
+  - len(s)<=T:
+    - -e[s] + z[s]/(a*(1-p)+c)*(1-kappa) + psi[s]                           ⟂ f[s]
+  - len(s)>T:
+    - f[s]                                                      ⟂ f[s]
+  - Sum[ f[x] | x in H(s) ] - Rbar                                  ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                                 ⟂ 0 <= phi[s]
+
+
+optimal_stop:
+  - -z[s] + etree.values[s]                                               ⟂ z[s]
+  - -e[s] + a/(a+c)*p*E[ e[x]   | x in S(s)] + 1.0/(a+c)*(z[s]-f[s])  ⟂ e[s]
+  - len(s)==1:
+    - (-Gamma[s]) + (e[s]-estar)                                    ⟂ Gamma[s]
+  - len(s)>1:
+    - (-Gamma[s]) + a/(a+c)*p*Gamma[P(s)] + (beta*p)**t*(e[s]-estar)      ⟂ Gamma[s]
+  - ((sum(s)<1) and len(s)>T)
+    - (-Gamma[s]) + E[ Gamma[x] | x in S(s) ] + psi[s] - phi[s]     ⟂ f[s]
+  - ((sum(s)<1) and len(s)<=T):
+    - e[s]     ⟂ f[s]
+  #- sum(s)==1: # two periods outflows
+  #  - -f[s]                                                         | f[s]
+  # - sum(s)<=1:
+  #   - (-Gamma[s]) + E[ Gamma[x] | x in S(s) ] + psi[s] - phi[s]     | f[s]
+  # - sum(s)==2: # two periods outflows
+  #   - -f[s]                                                         | f[s]
+  - len(s)<=T:
+      - Rbar - Sum[f[x] | x in H(s)] - R[s]                             ⟂ R[s]
+  - len(s)>T:
+      - Rbar - Sum[f[x] | x in H(s)] - L - R[s]                        ⟂ R[s]
+  - len(s)<=T:
+      - Sum[ f[x] | x in H(s) ] - Rbar                                  ⟂ 0 <= psi[s]
+  - len(s)>T:
+      - Sum[ f[x] | x in H(s) ] + L - Rbar                              ⟂ 0 <= psi[s]
+  - (-(f[s]-min_f))                                                 ⟂ 0 <= phi[s]
