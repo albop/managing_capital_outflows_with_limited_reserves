@@ -5,7 +5,7 @@ The code requires Python 3.6 and depends on two libraries:
 - [dolo](https://github.com/EconForge/dolo)
 - [backtothetrees](https://github.com/albop/backtothetrees)
 
-An up-to-date version of the code can be found on [github](https://github.com/albop/managing_capital_outflows_with_limited_reserves
+An up-to-date version of the code can be found on [github](https://github.com/albop/managing_capital_outflows_with_limited_reserves)
 
 
 To generate the results run:
